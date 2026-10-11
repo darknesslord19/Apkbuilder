@@ -1,0 +1,55 @@
+name: Automatic Android APK Builder
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'source.zip'
+      - '.github/workflows/build.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Prepare source
+        run: |
+          mkdir -p work
+          unzip -o source.zip -d work
+          echo 'ZIP içeriği:'
+          find work -maxdepth 4 \( -name gradlew -o -name build.gradle -o -name build.gradle.kts \) -print
+          WRAPPER=$(find work -type f -name gradlew -print -quit)
+          if [ -n "$WRAPPER" ]; then
+            ROOT=$(dirname "$WRAPPER")
+            chmod +x "$WRAPPER"
+            echo "PROJECT_ROOT=$ROOT" >> $GITHUB_ENV
+            echo "USE_WRAPPER=true" >> $GITHUB_ENV
+          else
+            BUILD=$(find work -type f \( -name build.gradle -o -name build.gradle.kts \) -print -quit)
+            if [ -z "$BUILD" ]; then echo 'Gradle Android projesi bulunamadı. ZIP, derlenebilir Android kaynak projesi içermeli.'; exit 1; fi
+            ROOT=$(dirname "$BUILD")
+            while [ "$ROOT" != "work" ] && [ ! -f "$ROOT/settings.gradle" ] && [ ! -f "$ROOT/settings.gradle.kts" ]; do ROOT=$(dirname "$ROOT"); done
+            echo "PROJECT_ROOT=$ROOT" >> $GITHUB_ENV
+            echo "USE_WRAPPER=false" >> $GITHUB_ENV
+          fi
+      - name: Set up Gradle
+        if: env.USE_WRAPPER == 'false'
+        uses: gradle/actions/setup-gradle@v4
+      - name: Build debug APK
+        working-directory: ${{ env.PROJECT_ROOT }}
+        run: |
+          if [ "$USE_WRAPPER" = 'true' ]; then ./gradlew --no-daemon assembleDebug; else gradle --no-daemon assembleDebug; fi
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-debug-APK
+          path: |
+            ${{ env.PROJECT_ROOT }}/**/build/outputs/apk/**/*.apk
+          if-no-files-found: error
