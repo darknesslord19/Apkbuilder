@@ -1,7 +1,6 @@
 package com.darknesslord.hizlidonus;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -59,23 +58,38 @@ public class MainActivity extends Activity {
     }
 
     private void openExternal(Uri uri) {
-        String scheme = uri.getScheme() == null ? "" : uri.getScheme();
-        Intent intent = scheme.equals("sms")
-                ? new Intent(Intent.ACTION_SENDTO, uri)
-                : new Intent(Intent.ACTION_VIEW, uri);
-        if (scheme.equals("sms")) {
-            String body = uri.getQueryParameter("body");
-            if (body != null) {
-                intent.putExtra("sms_body", body);
-                String ssp = uri.getEncodedSchemeSpecificPart();
-                int q = ssp.indexOf('?');
-                intent.setData(Uri.parse("smsto:" + (q >= 0 ? ssp.substring(0, q) : ssp)));
+        String scheme = uri.getScheme() == null ? "" : uri.getScheme().toLowerCase();
+        Intent intent;
+        if (scheme.equals("sms") || scheme.equals("smsto")) {
+            // sms:+905321234567?body=... (opak URI, getQueryParameter kullanılamaz)
+            String ssp = uri.getEncodedSchemeSpecificPart();
+            if (ssp == null) ssp = "";
+            String number = ssp;
+            String body = null;
+            int q = ssp.indexOf('?');
+            if (q >= 0) {
+                number = ssp.substring(0, q);
+                for (String part : ssp.substring(q + 1).split("&")) {
+                    if (part.startsWith("body=")) body = Uri.decode(part.substring(5));
+                }
             }
+            intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + Uri.decode(number)));
+            if (body != null && !body.isEmpty()) intent.putExtra("sms_body", body);
+        } else {
+            intent = new Intent(Intent.ACTION_VIEW, uri);
         }
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         try {
             startActivity(intent);
-        } catch (ActivityNotFoundException e) {
+        } catch (Exception e) {
+            try {
+                if (scheme.startsWith("sms")) {
+                    Intent fallback = new Intent(Intent.ACTION_VIEW, uri);
+                    fallback.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(fallback);
+                    return;
+                }
+            } catch (Exception ignored) { }
             Toast.makeText(this, "Bu bağlantıyı açacak uygulama bulunamadı", Toast.LENGTH_SHORT).show();
         }
     }
