@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+<title>Danışan İletişimi</title>
+<style>
+  :root{
+    --bg:#0c1013;
+    --card:#12171b;
+    --card-2:#161d22;
+    --line:#232c32;
+    --line-soft:#1b2227;
+    --text:#eef2f4;
+    --muted:#8a99a1;
+    --muted-2:#5f6d74;
+    --accent:#c9a86a;
+    --wa:#25d366;
+    --tg:#2aabee;
+    --danger:#e2574c;
+  }
+  *{box-sizing:border-box;}
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    margin:0;
+    min-height:100vh;
+    min-height:100dvh;
+    background:
+      radial-gradient(circle at 15% -10%, rgba(201,168,106,0.06), transparent 45%),
+      radial-gradient(circle at 90% 110%, rgba(37,211,102,0.05), transparent 45%),
+      var(--bg);
+    font-family:"Segoe UI", system-ui, -apple-system, sans-serif;
+    color:var(--text);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    padding-top:max(20px, env(safe-area-inset-top));
+    padding-bottom:max(20px, env(safe-area-inset-bottom));
+    padding-left:max(20px, env(safe-area-inset-left));
+    padding-right:max(20px, env(safe-area-inset-right));
+  }
+  .card{
+    width:100%;
+    max-width:440px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:30px 26px;
+    box-shadow:0 24px 70px rgba(0,0,0,0.45);
+  }
+  @media (max-width:480px){
+    body{ padding:14px; align-items:flex-start; padding-top:max(26px, env(safe-area-inset-top)); }
+    .card{ border-radius:14px; padding:22px 18px; }
+  }
+  .eyebrow{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:11px;
+    letter-spacing:1.4px;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:600;
+    margin-bottom:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:6px; height:6px;
+    border-radius:50%;
+    background:var(--accent);
+    display:inline-block;
+  }
+  h1{
+    font-size:20px;
+    margin:0 0 6px;
+    letter-spacing:0.1px;
+    font-weight:600;
+  }
+  p.sub{
+    margin:0 0 26px;
+    color:var(--muted);
+    font-size:13.5px;
+    line-height:1.55;
+  }
+  label{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    font-size:12.5px;
+    color:var(--muted);
+    margin-bottom:8px;
+    font-weight:500;
+  }
+  .field-block{
+    margin-bottom:20px;
+  }
+  .btn.sms{ background:var(--card-2); color:var(--text); border:1px solid var(--line); }
+  .input-row{
+    display:flex;
+    gap:8px;
+    position:relative;
+  }
+  select{
+    background:var(--card-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    border-radius:10px;
+    padding:0 8px;
+    font-size:14.5px;
+    min-height:48px;
+    max-width:38%;
+    flex-shrink:0;
+  }
+  .input-wrap{
+    position:relative;
+    flex:1;
+    min-width:0;
+  }
+  input[type="text"]{
+    width:100%;
+    background:var(--card-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    border-radius:10px;
+    padding:12px 40px 12px 14px;
+    font-size:16px;
+    min-height:48px;
+    outline:none;
+    transition:border-color .15s;
+  }
+  input[type="text"]:focus{
+    border-color:var(--accent);
+  }
+  textarea{
+    width:100%;
+    background:var(--card-2);
+    border:1px solid var(--line);
+    color:var(--text);
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:14.5px;
+    line-height:1.55;
+    font-family:inherit;
+    resize:vertical;
+    min-height:150px;
+    outline:none;
+    transition:border-color .15s, opacity .15s;
+  }
+  textarea:focus{
+    border-color:var(--accent);
+  }
+  textarea:disabled{
+    opacity:0.45;
+    resize:none;
+    cursor:not-allowed;
+  }
+  .toggle-row{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    margin-bottom:10px;
+    font-size:12.5px;
+    color:var(--muted);
+    cursor:pointer;
+    font-weight:500;
+    justify-content:flex-start;
+  }
+  .toggle-row input[type="checkbox"]{
+    width:16px;
+    height:16px;
+    accent-color:var(--accent);
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .message-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .message-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:11px 12px;
+    background:var(--card-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .message-row:hover{ border-color:var(--muted-2); }
+  .message-row.selected{
+    border-color:var(--accent);
+    background:rgba(201,168,106,0.07);
+  }
+  .message-row input[type="radio"]{
+    width:16px;
+    height:16px;
+    margin-top:2px;
+    accent-color:var(--accent);
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .message-row-text{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:0;
+  }
+  .message-row-text strong{
+    font-size:13px;
+    font-weight:600;
+    color:var(--text);
+  }
+  .message-row-text span{
+    font-size:11.5px;
+    color:var(--muted);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .status-line{
+    font-size:11px;
+    color:var(--muted-2);
+    margin-bottom:10px;
+    min-height:14px;
+  }
+  .clear-btn{
+    position:absolute;
+    right:6px;
+    top:50%;
+    transform:translateY(-50%);
+    width:32px;
+    height:32px;
+    border:none;
+    background:transparent;
+    color:var(--muted-2);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:8px;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+    transition:color .15s, background .15s;
+  }
+  .clear-btn:hover{
+    color:var(--danger);
+    background:rgba(226,87,76,0.1);
+  }
+  .clear-btn svg{ width:16px; height:16px; }
+  .clear-btn.textarea-clear{
+    position:static;
+    transform:none;
+    width:auto;
+    height:auto;
+    padding:0;
+    font-size:11.5px;
+    gap:5px;
+    color:var(--muted);
+    font-weight:500;
+  }
+  .clear-btn.textarea-clear svg{ width:13px; height:13px; }
+  .clear-btn.textarea-clear:hover{ color:var(--danger); background:none; }
+  .error{
+    min-height:16px;
+    color:var(--danger);
+    font-size:12px;
+    margin-top:6px;
+  }
+  .actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:22px;
+  }
+  .btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    text-decoration:none;
+    padding:14px 16px;
+    min-height:50px;
+    border-radius:11px;
+    font-size:14.5px;
+    font-weight:600;
+    letter-spacing:0.1px;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+    transition:transform .12s, filter .12s, opacity .2s;
+    opacity:0;
+    pointer-events:none;
+    transform:translateY(4px);
+  }
+  .btn.show{
+    opacity:1;
+    pointer-events:auto;
+    transform:translateY(0);
+  }
+  .btn:hover{ filter:brightness(1.08); }
+  .btn:active{ transform:scale(0.98); }
+  .btn.wa{ background:var(--wa); color:#08150f; }
+  .btn.tg{ background:var(--tg); color:#071824; }
+  .btn svg{ width:19px; height:19px; flex-shrink:0; }
+  .hint{
+    margin-top:20px;
+    font-size:11px;
+    color:var(--muted-2);
+    line-height:1.6;
+    border-top:1px solid var(--line-soft);
+    padding-top:14px;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="eyebrow">İletişim Asistanı</div>
+  <h1>Danışana hızlı dönüş</h1>
+  <p class="sub">Numarayı gir, hazır mesajını düzenle; WhatsApp, Telegram sohbeti ya da hattın normal SMS'i mesaj yazılı şekilde açılsın.</p>
+
+  <div class="field-block">
+    <label for="phone">Telefon numarası</label>
+    <div class="input-row">
+      <select id="country">
+        <option value="90" selected>🇹🇷 +90</option>
+        <option value="1">🇺🇸 +1</option>
+        <option value="49">🇩🇪 +49</option>
+        <option value="44">🇬🇧 +44</option>
+        <option value="7">🇷🇺 +7</option>
+        <option value="0">Kod dahil</option>
+      </select>
+      <div class="input-wrap">
+        <input type="text" id="phone" placeholder="532 123 45 67" inputmode="numeric" autocomplete="tel">
+        <button type="button" class="clear-btn" id="clearPhone" aria-label="Numarayı sil" title="Numarayı sil">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="error" id="err"></div>
+  </div>
+
+  <div class="field-block">
+    <label>
+      <span>Hazır mesajlar</span>
+      <button type="button" class="clear-btn textarea-clear" id="reloadMessages">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        yenile
+      </button>
+    </label>
+    <div class="status-line" id="msgStatus">Mesajlar yükleniyor…</div>
+    <div class="message-list" id="messageList"></div>
+  </div>
+
+  <div class="field-block">
+    <label for="message">
+      <span>Seçilen mesaj (düzenlenebilir)</span>
+    </label>
+    <label class="toggle-row" for="sendMessage">
+      <input type="checkbox" id="sendMessage">
+      <span>Bu mesajı sohbete otomatik ekle</span>
+    </label>
+    <textarea id="message" disabled></textarea>
+  </div>
+
+  <div class="actions">
+    <a href="#" target="_blank" rel="noopener" class="btn wa" id="waBtn">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 3.6c-4.87 0-8.83 3.92-8.83 8.75a8.7 8.7 0 0 0 1.18 4.38L3 21l4.42-1.15a8.9 8.9 0 0 0 4.63 1.28h0c4.87 0 8.83-3.92 8.83-8.75a8.65 8.65 0 0 0-3.28-6.06zm-5.55 13.47a7.4 7.4 0 0 1-3.77-1.03l-.27-.16-2.63.68.7-2.55-.18-.27a7.27 7.27 0 0 1-1.13-3.9c0-4.02 3.3-7.29 7.35-7.29a7.32 7.32 0 0 1 5.2 2.13 7.2 7.2 0 0 1 2.15 5.15c0 4.02-3.3 7.24-7.42 7.24zm4.03-5.42c-.22-.11-1.3-.64-1.5-.71-.2-.07-.35-.11-.5.11-.15.22-.57.71-.7.86-.13.14-.26.16-.48.05-.22-.11-.94-.34-1.79-1.09a6.7 6.7 0 0 1-1.24-1.53c-.13-.22-.01-.34.1-.45.1-.1.22-.26.33-.39.11-.13.15-.22.22-.36.07-.15.04-.28-.02-.39-.07-.11-.5-1.2-.68-1.64-.18-.43-.36-.37-.5-.38h-.43c-.15 0-.39.05-.6.28-.2.22-.79.77-.79 1.88s.81 2.18.92 2.33c.11.15 1.6 2.44 3.87 3.42.54.23.96.37 1.29.47.54.17 1.03.15 1.42.09.43-.06 1.3-.53 1.49-1.04.18-.51.18-.95.13-1.04-.05-.09-.2-.15-.42-.26z"/></svg>
+      WhatsApp'ta yaz
+    </a>
+    <a href="#" target="_blank" rel="noopener" class="btn tg" id="tgBtn">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.6 18.6 20.1c-.25 1.1-.9 1.37-1.83.85l-5.05-3.72-2.44 2.35c-.27.27-.5.5-1.02.5l.36-5.15L18 6.1c.4-.36-.09-.56-.62-.2l-11.4 7.18-4.9-1.53c-1.07-.33-1.08-1.07.23-1.58L20.5 3.02c.9-.33 1.68.2 1.4 1.58z"/></svg>
+      Telegram'da yaz
+    </a>
+    <a href="#" class="btn sms" id="smsBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Normal mesaj (SMS) at
+    </a>
+  </div>
+
+  <div class="hint">
+    "Bu mesajı sohbete otomatik ekle" işaretli değilse sohbet/mesaj boş açılır. İşaretlersen listeden seçtiğin (veya düzenlediğin) mesaj WhatsApp'a ve SMS'e otomatik eklenir; Telegram'da bu yalnızca kullanıcı adıyla açılan sohbetlerde çalışır. "Normal mesaj (SMS) at" butonu telefonun mesajlar uygulamasını açar, hattın normal SMS'i olarak gider — internet gerektirmez. Mesajlar GitHub'daki messages.json dosyasından çekiliyor — link ayarlanmadıysa yerel varsayılan mesajlar gösterilir.
+  </div>
+</div>
+
+<script>
+  // === Buraya GitHub'a yüklediğin messages.json dosyasının RAW linkini yapıştır ===
+  // Örnek: https://raw.githubusercontent.com/kullaniciadi/repo-adi/main/messages.json
+  const MESSAGES_URL = "https://raw.githubusercontent.com/darkneslord19/Dark/refs/heads/main/contact.json";
+
+  // GitHub linki henüz ayarlanmadıysa veya erişilemezse gösterilecek yerel yedek mesajlar
+  const FALLBACK_MESSAGES = [
+    {
+      "id": "seans-disi",
+      "title": "Seans dışı",
+      "text": "Merhaba, şu an seanstayım. Size en kısa sürede dönüş yapacağım.\n\nDaha hızlı yardımcı olabilmem için lütfen;\n\n• İsminizi\n• Beni ne için aradığınızı (görüşme talebi, bilgi, danışmanlık vb.)\n• Varsa referansınızı (kim/nereden yönlendirme oldu)\n\nmesaj olarak iletir misiniz?"
+    },
+    {
+      "id": "randevu-talebi",
+      "title": "Randevu talebi",
+      "text": "Merhaba, randevu talebiniz için teşekkür ederim. Uygun olduğunuz gün ve saat aralıklarını paylaşırsanız size en kısa sürede uygun bir zaman önerebilirim."
+    },
+    {
+      "id": "yogun-donem",
+      "title": "Yoğun dönem",
+      "text": "Merhaba, şu anda yoğun bir dönemdeyim ve mesajlara biraz gecikmeli dönüş yapabiliyorum. Mesajınızı aldım, en kısa sürede size döneceğim."
+    },
+    {
+      "id": "izin-tatil",
+      "title": "İzindeyim",
+      "text": "Merhaba, şu anda izindeyim ve mesajlara dönüş yapamıyorum. Acil bir durum değilse dönüşümü bekleyebilirsiniz, aksi halde lütfen belirtin."
+    }
+  ];
+
+  const phoneInput = document.getElementById('phone');
+  const countrySelect = document.getElementById('country');
+  const errEl = document.getElementById('err');
+  const waBtn = document.getElementById('waBtn');
+  const tgBtn = document.getElementById('tgBtn');
+  const smsBtn = document.getElementById('smsBtn');
+  const clearPhone = document.getElementById('clearPhone');
+  const messageEl = document.getElementById('message');
+  const sendMessageBox = document.getElementById('sendMessage');
+  const messageListEl = document.getElementById('messageList');
+  const msgStatusEl = document.getElementById('msgStatus');
+  const reloadBtn = document.getElementById('reloadMessages');
+
+  let messages = [];
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  async function loadMessages() {
+    msgStatusEl.textContent = 'Mesajlar yükleniyor…';
+    try {
+      const res = await fetch(MESSAGES_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error('İstek başarısız: ' + res.status);
+      const data = await res.json();
+      if (!data.messages || !Array.isArray(data.messages) || !data.messages.length) {
+        throw new Error('JSON boş ya da hatalı formatta');
+      }
+      messages = data.messages;
+      msgStatusEl.textContent = 'Mesajlar GitHub\'dan yüklendi ✓';
+    } catch (e) {
+      messages = FALLBACK_MESSAGES;
+      msgStatusEl.textContent = 'GitHub\'dan yüklenemedi, yerel varsayılan mesajlar gösteriliyor.';
+    }
+    renderMessages();
+  }
+
+  function renderMessages() {
+    messageListEl.innerHTML = '';
+    messages.forEach((m, i) => {
+      const row = document.createElement('label');
+      row.className = 'message-row';
+      const preview = m.text.length > 70 ? m.text.slice(0, 70) + '…' : m.text;
+      row.innerHTML = `
+        <input type="radio" name="msgChoice" value="${i}">
+        <div class="message-row-text">
+          <strong>${escapeHtml(m.title || ('Mesaj ' + (i + 1)))}</strong>
+          <span>${escapeHtml(preview.replace(/\n/g, ' '))}</span>
+        </div>`;
+      const radio = row.querySelector('input');
+      radio.addEventListener('change', () => selectMessage(i));
+      messageListEl.appendChild(row);
+    });
+    if (messages.length) {
+      selectMessage(0);
+      const firstRadio = messageListEl.querySelector('input[name="msgChoice"]');
+      if (firstRadio) firstRadio.checked = true;
+    }
+  }
+
+  function selectMessage(i) {
+    messageEl.value = messages[i].text;
+    [...messageListEl.children].forEach((row, idx) => {
+      row.classList.toggle('selected', idx === i);
+    });
+    update();
+  }
+
+  function update() {
+    const raw = phoneInput.value.replace(/[^\d]/g, '');
+    const cc = countrySelect.value;
+    errEl.textContent = '';
+
+    if (!raw) {
+      waBtn.classList.remove('show');
+      tgBtn.classList.remove('show');
+      smsBtn.classList.remove('show');
+      return;
+    }
+
+    let full;
+    if (cc === '0') {
+      full = raw;
+    } else {
+      const trimmed = raw.replace(/^0+/, '');
+      full = cc + trimmed;
+    }
+
+    if (full.length < 8 || full.length > 15) {
+      errEl.textContent = 'Numara çok kısa ya da çok uzun görünüyor.';
+      waBtn.classList.remove('show');
+      tgBtn.classList.remove('show');
+      smsBtn.classList.remove('show');
+      return;
+    }
+
+    const includeText = sendMessageBox.checked && messageEl.value.trim();
+    const text = includeText ? encodeURIComponent(messageEl.value.trim()) : '';
+    waBtn.href = `https://wa.me/${full}${text ? `?text=${text}` : ''}`;
+    tgBtn.href = `https://t.me/+${full}${text ? `?text=${text}` : ''}`;
+    // SMS için numara + kod birlikte gider, body parametresi mesajı önceden doldurur
+    smsBtn.href = `sms:+${full}${text ? `?body=${text}` : ''}`;
+    waBtn.classList.add('show');
+    tgBtn.classList.add('show');
+    smsBtn.classList.add('show');
+  }
+
+  phoneInput.addEventListener('input', update);
+  countrySelect.addEventListener('change', update);
+  messageEl.addEventListener('input', update);
+
+  sendMessageBox.addEventListener('change', () => {
+    messageEl.disabled = !sendMessageBox.checked;
+    update();
+  });
+
+  clearPhone.addEventListener('click', () => {
+    phoneInput.value = '';
+    phoneInput.focus();
+    update();
+  });
+
+  reloadBtn.addEventListener('click', loadMessages);
+
+  loadMessages();
+</script>
+
+</body>
+</html>
